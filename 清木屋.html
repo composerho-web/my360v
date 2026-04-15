@@ -3,92 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>360 導覽：方位驗證</title>
+    <title>360 導覽：實地定位</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center; padding-top: 50px; line-height: 1.6; color: #333; background-color: #f8f9fa; }
-        .card { background: white; max-width: 350px; margin: 0 auto; padding: 30px; border-radius: 15px; shadow: 0 4px 6px rgba(0,0,0,0.1); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .btn { padding: 15px 30px; background: #007bff; color: white; border: none; border-radius: 50px; cursor: pointer; font-size: 18px; font-weight: bold; width: 100%; transition: 0.3s; }
-        .btn:active { transform: scale(0.98); }
-        #status { margin-top: 25px; font-size: 1.2em; }
-        #direction-info { color: #555; font-size: 1.1em; margin-top: 15px; padding: 10px; background: #e9ecef; border-radius: 8px; display: none; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center; padding: 20px; line-height: 1.6; color: #333; background-color: #f0f2f5; margin: 0; }
+        .container { max-width: 500px; margin: 0 auto; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        h2 { margin-top: 0; color: #1a1a1a; }
+        .btn { padding: 15px 30px; background: #007bff; color: white; border: none; border-radius: 50px; cursor: pointer; font-size: 18px; font-weight: bold; width: 100%; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
+        .btn:active { transform: scale(0.97); background: #0069d9; }
+        .btn:disabled { background: #a0cfff; cursor: not-allowed; }
+        
+        #status { margin-top: 20px; font-size: 1.1em; font-weight: 500; min-height: 1.2em; }
+        #direction-info { color: #444; font-size: 1.05em; margin-top: 15px; padding: 12px; background: #e9ecef; border-radius: 10px; display: none; border-left: 5px solid #6c757d; text-align: left; }
+        #direction-info b { color: #000; }
+
+        /* 地圖容器樣式 - 必須設定高度 */
+        #map { height: 300px; width: 100%; border-radius: 12px; margin-top: 20px; border: 2px solid #ddd; display: none; }
     </style>
 </head>
 <body>
+
+<div class="container">
     <div class="card">
-        <h2>請移動至清木屋</h2>
-        <p>請檢查您的位置以解鎖 360 內容</p>
-        <button class="btn" onclick="checkLocation()">檢查我的位置</button>
+        <h2>請依據地圖前往清木屋</h2>
+        <p>此內容僅限在指定地點解鎖，請開啟手機 GPS 定位。</p>
+        <button class="btn" id="checkBtn" onclick="checkLocation()">按此更新與檢查我的位置</button>
         
         <div id="status"></div>
         <div id="direction-info"></div>
+        
+        <div id="map"></div>
     </div>
+</div>
 
-    <script>
-        // --- 設定區 ---
-        const targetLat = 23.465769176618156; // 目標緯度
-        const targetLon = 120.24550950199206; // 目標經度
-        const targetUrl = "https://tour.panoee.net/69dad6632e463550313e234a"; 
-        const unlockDistance = 100; // 解鎖距離（公尺）
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-        // --- 數學計算：Haversine 距離 ---
-        function getDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371000;
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                      Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) *
-                      Math.sin(dLon/2) * Math.sin(dLon/2);
-            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        }
+<script>
+    // --- 實地考察設定區 (請修改此處) ---
+    // 範例座標：台北 101
+    const targetLat = 24.941951087895728; 
+    const targetLon = 121.21896666191996; 
+    const targetUrl = "https://tour.panoee.net/69dad6632e463550313e234a"; // 例如 Panoee 或 Momento360 的連結
+    const unlockDistance = 200; // 解鎖距離（公尺）
 
-        // --- 數學計算：方位角 ---
-        function getBearing(lat1, lon1, lat2, lon2) {
-            const φ1 = lat1 * Math.PI / 180;
-            const φ2 = lat2 * Math.PI / 180;
-            const Δλ = (lon2 - lon1) * Math.PI / 180;
-            const y = Math.sin(Δλ) * Math.cos(φ2);
-            const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
-            let bearing = Math.atan2(y, x) * 180 / Math.PI;
-            return (bearing + 360) % 360; // 轉為 0-360 度
-        }
+    // --- 全域變數 ---
+    let map = null;
+    let userMarker = null;
+    let targetMarker = null;
+    const checkBtn = document.getElementById('checkBtn');
 
-        // --- 角度轉文字方向 ---
-        function getDirectionText(bearing) {
-            const sectors = ["北方", "東北方", "東方", "東南方", "南方", "西南方", "西方", "西北方"];
-            const index = Math.round(bearing / 45) % 8;
-            return sectors[index];
-        }
+    // --- 數學計算：Haversine 距離 (公尺) ---
+    function getDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371000;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
 
-        function checkLocation() {
-            const status = document.getElementById('status');
-            const dirInfo = document.getElementById('direction-info');
+    // --- 數學計算：方位角 ---
+    function getBearing(lat1, lon1, lat2, lon2) {
+        const φ1 = lat1 * Math.PI / 180;
+        const φ2 = lat2 * Math.PI / 180;
+        const Δλ = (lon2 - lon1) * Math.PI / 180;
+        const y = Math.sin(Δλ) * Math.cos(φ2);
+        const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+        return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+    }
+
+    // --- 角度轉文字方向 ---
+    function getDirectionText(bearing) {
+        const sectors = ["北方", "東北方", "東方", "東南方", "南方", "西南方", "西方", "西北方"];
+        return sectors[Math.round(bearing / 45) % 8];
+    }
+
+    // --- 初始化地圖 ---
+    function initMap(userLat, userLon) {
+        const mapEl = document.getElementById('map');
+        mapEl.style.display = 'block'; // 顯示地圖容器
+
+        // 1. 建立地圖物件，設定中心點為使用者和目標的中間點
+        const centerLat = (userLat + targetLat) / 2;
+        const centerLon = (userLon + targetLon) / 2;
+        map = L.map('map').setView([centerLat, centerLon], 16);
+
+        // 2. 載入 OpenStreetMap 地圖瓷磚 (免費地圖源)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // 3. 定義不同的符號樣式
+        // 目標地點：紅色實心圓
+        const targetIcon = L.circleMarker([targetLat, targetLon], {
+            radius: 12, fillColor: "#ff3b30", color: "#fff", weight: 3, opacity: 1, fillOpacity: 0.9
+        }).addTo(map).bindPopup("<b>目標地點</b>").openPopup();
+
+        // 使用者位置：藍色圓點加外圈 (類似 Google Maps 樣式)
+        userMarker = L.circleMarker([userLat, userLon], {
+            radius: 8, fillColor: "#007bff", color: "#fff", weight: 3, opacity: 1, fillOpacity: 1
+        }).addTo(map).bindPopup("您的位置");
+
+        // 4. 自動調整地圖縮放比例，確保兩點都在畫面內
+        const group = new L.featureGroup([targetIcon, userMarker]);
+        map.fitBounds(group.getBounds().pad(0.2)); // 加入 20% 的填充邊距
+    }
+
+    // --- 更新地圖位置 ---
+    function updateMap(userLat, userLon) {
+        if (map && userMarker) {
+            userMarker.setLatLng([userLat, userLon]); // 更新使用者符號位置
             
-            status.innerText = "正在讀取 GPS...";
-            dirInfo.style.display = "none";
-
-            navigator.geolocation.getCurrentPosition((pos) => {
-                const lat = pos.coords.latitude;
-                const lon = pos.coords.longitude;
-                
-                const distance = getDistance(lat, lon, targetLat, targetLon);
-                const bearing = getBearing(lat, lon, targetLat, targetLon);
-                const direction = getDirectionText(bearing);
-                const roundedDist = Math.round(distance);
-
-                if (distance <= unlockDistance) {
-                    status.style.color = "#28a745";
-                    status.innerHTML = "✅ 驗證成功！<br>即將進入謎題...";
-                    setTimeout(() => { window.location.href = targetUrl; }, 1500);
-                } else {
-                    status.style.color = "#dc3545";
-                    status.innerText = "尚未到達指定地點";
-                    dirInfo.style.display = "block";
-                    dirInfo.innerHTML = `目標在您的 <b>${direction}</b><br>距離約 <b>${roundedDist}</b> 公尺`;
-                }
-            }, (err) => {
-                status.innerText = "無法存取定位，請確認開啟 GPS 並使用 HTTPS 連線。";
-            }, { enableHighAccuracy: true });
+            // 重新調整邊界，確保兩點都在
+            const targetLatLng = L.latLng(targetLat, targetLon);
+            const userLatLng = L.latLng(userLat, userLon);
+            const bounds = L.latLngBounds(targetLatLng, userLatLng);
+            map.fitBounds(bounds.pad(0.2));
         }
-    </script>
+    }
+
+    // --- 主流程：檢查位置 ---
+    function checkLocation() {
+        const status = document.getElementById('status');
+        const dirInfo = document.getElementById('direction-info');
+        
+        checkBtn.disabled = true; // 停用按鈕，防止重複點擊
+        checkBtn.innerText = "讀取 GPS 中...";
+        status.innerText = "正在精確定位您的位置...";
+        status.style.color = "#333";
+        dirInfo.style.display = "none";
+
+        // 檢查瀏覽器是否支援 GPS
+        if (!navigator.geolocation) {
+            status.innerText = "😞 您的瀏覽器不支援定位功能。";
+            checkBtn.disabled = false;
+            checkBtn.innerText = "檢查我的位置";
+            return;
+        }
+
+        // 要求 GPS 定位
+        navigator.geolocation.getCurrentPosition((pos) => {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            const accuracy = Math.round(pos.coords.accuracy); // 定位精確度（公尺）
+            
+            const distance = getDistance(lat, lon, targetLat, targetLon);
+            const bearing = getBearing(lat, lon, targetLat, targetLon);
+            const direction = getDirectionText(bearing);
+            const roundedDist = Math.round(distance);
+
+            // 恢復按鈕狀態
+            checkBtn.disabled = false;
+            checkBtn.innerText = "重新檢查位置";
+
+            // 初始化或更新地圖
+            if (!map) {
+                initMap(lat, lon);
+            } else {
+                updateMap(lat, lon);
+            }
+
+            // 判斷是否在解鎖範圍內
+            if (distance <= unlockDistance) {
+                status.style.color = "#28a745";
+                status.innerHTML = `✅ 驗證成功！<br>已進入範圍 (${roundedDist}公尺)。`;
+                checkBtn.innerText = "即將進入導覽...";
+                checkBtn.disabled = true;
+                // 1.5 秒後跳轉
+                setTimeout(() => { window.location.href = targetUrl; }, 1500);
+            } else {
+                status.style.color = "#dc3545";
+                status.innerText = "❌ 尚未到達指定地點";
+                
+                dirInfo.style.display = "block";
+                dirInfo.innerHTML = `
+                    <div style="margin-bottom:8px">📍 目標在您的 <b>${direction}</b></div>
+                    <div style="margin-bottom:8px">📏 距離約 <b>${roundedDist}公尺</b></div>
+                    <div style="font-size:0.9em;color:#666;">(需進入 ${unlockDistance}公尺內，目前定位誤差約 ${accuracy}公尺)</div>
+                `;
+            }
+        }, (err) => {
+            // 錯誤處理
+            checkBtn.disabled = false;
+            checkBtn.innerText = "檢查我的位置";
+            status.style.color = "#dc3545";
+            if (err.code === 1) {
+                status.innerText = "❌定位失敗：請開啟瀏覽器的定位權限。";
+            } else if (err.code === 2) {
+                status.innerText = "❌定位失敗：無法取得 GPS 訊號 (請至室外或窗邊)。";
+            } else {
+                status.innerText = "❌定位失敗：發生未知錯誤。";
+            }
+        }, { 
+            enableHighAccuracy: true, // 強制使用精確定位 (GPS)
+            timeout: 15000,           // 等待逾時 (15秒)
+            maximumAge: 0             // 不使用快取位置
+        });
+    }
+</script>
+
 </body>
 </html>
