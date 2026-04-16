@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>任務：清木屋</title>
+    <title>任務：配天宮</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
     
     <style>
@@ -25,7 +25,7 @@
 
 <div class="container">
     <div class="card">
-        <h2>請依據地圖前往清木屋</h2>
+        <h2>請依據地圖前往配天宮</h2>
         <p>此內容僅限在指定地點解鎖，請開啟手機 GPS 定位。</p>
         
         <div id="map"></div>
@@ -42,9 +42,9 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
 <script>
-    const targetLat = 23.465774212252132; 
-    const targetLon = 120.2454558681457; 
-    const targetUrl = "https://tour.panoee.net/69dad6632e463550313e234a"; 
+    const targetLat = 23.46781353353704; 
+    const targetLon = 120.245208810634; 
+    const targetUrl = "https://tour.panoee.net/69e0c15d4b5ddaf9f6f7abc4"; 
     const unlockDistance = 100; 
 
     let map = null;
@@ -81,7 +81,7 @@
         }).addTo(map);
         targetMarker = L.circleMarker([targetLat, targetLon], {
             radius: 12, fillColor: "#ff3b30", color: "#fff", weight: 3, opacity: 1, fillOpacity: 0.9
-        }).addTo(map).bindPopup("<b>目標地點：清木屋</b>").openPopup();
+        }).addTo(map).bindPopup("<b>目標地點：配天宮</b>").openPopup();
     }
 
     window.onload = initTargetMap;
