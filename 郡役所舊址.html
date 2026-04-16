@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任務：郡役所舊址</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center; padding: 20px; line-height: 1.6; color: #333; background-color: #f0f2f5; margin: 0; }
+        .container { max-width: 500px; margin: 0 auto; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        h2 { margin-top: 0; color: #1a1a1a; }
+        .btn { padding: 15px 30px; background: #007bff; color: white; border: none; border-radius: 50px; cursor: pointer; font-size: 18px; font-weight: bold; width: 100%; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
+        .btn:active { transform: scale(0.97); background: #0069d9; }
+        .btn:disabled { background: #a0cfff; cursor: not-allowed; }
+        
+        #status { margin-top: 20px; font-size: 1.1em; font-weight: 500; min-height: 1.2em; }
+        #direction-info { color: #444; font-size: 1.05em; margin-top: 15px; padding: 12px; background: #e9ecef; border-radius: 10px; display: none; border-left: 5px solid #6c757d; text-align: left; }
+        #direction-info b { color: #000; }
+        #map { height: 300px; width: 100%; border-radius: 12px; margin-top: 20px; border: 2px solid #ddd; display: block; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h2>請依據地圖前往郡役所舊址</h2>
+        <p>此內容僅限在指定地點解鎖，請開啟手機 GPS 定位。</p>
+        
+        <div id="map"></div>
+
+        <div style="margin-top: 20px;">
+            <button class="btn" id="checkBtn" onclick="checkLocation()">按此更新與檢查我的位置</button>
+        </div>
+        
+        <div id="status"></div>
+        <div id="direction-info"></div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+<script>
+    const targetLat = 23.46503859771851; 
+    const targetLon = 120.24641346217072; 
+    const targetUrl = "https://tour.panoee.net/69e0c5e24b5ddaabb9f7ad5b"; 
+    const unlockDistance = 100; 
+
+    let map = null;
+    let userMarker = null;
+    let targetMarker = null;
+    const checkBtn = document.getElementById('checkBtn');
+
+    function getDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371000;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+
+    function getBearing(lat1, lon1, lat2, lon2) {
+        const φ1 = lat1 * Math.PI / 180;
+        const φ2 = lat2 * Math.PI / 180;
+        const Δλ = (lon2 - lon1) * Math.PI / 180;
+        const y = Math.sin(Δλ) * Math.cos(φ2);
+        const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+        return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+    }
+
+    function getDirectionText(bearing) {
+        const sectors = ["北方", "東北方", "東方", "東南方", "南方", "西南方", "西方", "西北方"];
+        return sectors[Math.round(bearing / 45) % 8];
+    }
+
+    function initTargetMap() {
+        map = L.map('map').setView([targetLat, targetLon], 16);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+        targetMarker = L.circleMarker([targetLat, targetLon], {
+            radius: 12, fillColor: "#ff3b30", color: "#fff", weight: 3, opacity: 1, fillOpacity: 0.9
+        }).addTo(map).bindPopup("<b>目標地點：東石郡役所舊址</b>").openPopup();
+    }
+
+    window.onload = initTargetMap;
+
+    function checkLocation() {
+        const status = document.getElementById('status');
+        const dirInfo = document.getElementById('direction-info');
+        
+        checkBtn.disabled = true;
+        checkBtn.innerText = "讀取 GPS 中...";
+        status.innerText = "正在精確定位您的位置...";
+        status.style.color = "#333";
+        dirInfo.style.display = "none";
+
+        if (!navigator.geolocation) {
+            status.innerText = "😞 您的瀏覽器不支援定位功能。";
+            checkBtn.disabled = false;
+            checkBtn.innerText = "檢查我的位置";
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition((pos) => {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            const accuracy = Math.round(pos.coords.accuracy);
+            
+            const distance = getDistance(lat, lon, targetLat, targetLon);
+            const bearing = getBearing(lat, lon, targetLat, targetLon);
+            const direction = getDirectionText(bearing);
+            const roundedDist = Math.round(distance);
+
+            checkBtn.disabled = false;
+            checkBtn.innerText = "重新檢查位置";
+
+            if (!userMarker) {
+                userMarker = L.circleMarker([lat, lon], {
+                    radius: 8, fillColor: "#007bff", color: "#fff", weight: 3, opacity: 1, fillOpacity: 1
+                }).addTo(map).bindPopup("您的位置");
+            } else {
+                userMarker.setLatLng([lat, lon]);
+            }
+
+            const bounds = L.latLngBounds([targetLat, targetLon], [lat, lon]);
+            map.fitBounds(bounds.pad(0.2));
+
+            if (distance <= unlockDistance) {
+                status.style.color = "#28a745";
+                status.innerHTML = `✅ 驗證成功！<br>已進入範圍 (${roundedDist}公尺)。`;
+                checkBtn.innerText = "即將進入導覽...";
+                checkBtn.disabled = true;
+                setTimeout(() => { window.location.href = targetUrl; }, 1500);
+            } else {
+                status.style.color = "#dc3545";
+                status.innerText = "❌ 尚未到達指定地點";
+                dirInfo.style.display = "block";
+                dirInfo.innerHTML = `
+                    <div style="margin-bottom:8px">📍 目標在您的 <b>${direction}</b></div>
+                    <div style="margin-bottom:8px">📏 距離約 <b>${roundedDist}公尺</b></div>
+                    <div style="font-size:0.9em;color:#666;">(需進入 ${unlockDistance}公尺內，目前定位誤差約 ${accuracy}公尺)</div>
+                `;
+            }
+        }, (err) => {
+            checkBtn.disabled = false;
+            checkBtn.innerText = "檢查我的位置";
+            status.style.color = "#dc3545";
+            if (err.code === 1) status.innerText = "❌定位失敗：請開啟瀏覽器的定位權限。";
+            else if (err.code === 2) status.innerText = "❌定位失敗：無法取得 GPS 訊號 (請至室外或窗邊)。";
+            else status.innerText = "❌定位失敗：發生未知錯誤。";
+        }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+    }
+</script>
+</body>
+</html>
