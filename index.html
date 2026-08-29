@@ -1015,7 +1015,7 @@
             }
         }
 
-        // 呼叫單一模型（含 429 稍候重試一次同模型；若模型不支援 thinkingConfig 就拿掉再試）
+        // 呼叫單一模型（含 429 稍候重試同模型；若模型不接受 thinkingConfig/參數就拿掉再試）
         async function callModel(model, payload) {
             const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + CONFIG.apiKey;
             async function doFetch(body) {
@@ -1026,14 +1026,26 @@
                 await new Promise(r => setTimeout(r, 1200));
                 response = await doFetch(payload);
             }
-            // 某些模型(如部分 3.x/lite)不接受 thinkingConfig 或該數值 → 拿掉後重試一次
-            if (response.status === 400 && payload.generationConfig && payload.generationConfig.thinkingConfig) {
-                const errText = await response.clone().json().catch(() => ({}));
-                const msg = (errText.error && errText.error.message) || '';
-                if (/thinking|thinkingConfig|thinkingBudget|generationConfig/i.test(msg)) {
+            // 遇到 400（多半是某些模型不接受 thinkingConfig/參數）→ 逐步拿掉可選參數後重試，
+            // 不要一看到 400 就當成金鑰錯誤。錯誤訊息「invalid argument」也屬於這一類。
+            if (response.status === 400 && payload.generationConfig) {
+                // 先拿掉 thinkingConfig 再試
+                if (payload.generationConfig.thinkingConfig) {
                     const p2 = JSON.parse(JSON.stringify(payload));
                     delete p2.generationConfig.thinkingConfig;
                     response = await doFetch(p2);
+                }
+                // 若還是 400，改用最精簡的參數（只留 temperature）再試一次
+                if (response.status === 400) {
+                    const p3 = JSON.parse(JSON.stringify(payload));
+                    p3.generationConfig = { temperature: payload.generationConfig.temperature };
+                    response = await doFetch(p3);
+                }
+                // 若仍 400，最後連 generationConfig 都拿掉試一次（用模型預設）
+                if (response.status === 400) {
+                    const p4 = JSON.parse(JSON.stringify(payload));
+                    delete p4.generationConfig;
+                    response = await doFetch(p4);
                 }
             }
             if (!response.ok) {
@@ -1211,7 +1223,8 @@
                         }
                     } catch (err) {
                         lastErr = err;
-                        if (err.status === 400 || err.status === 401 || err.status === 403) { authErr = true; return; }
+                        // 只有明確的金鑰/權限錯誤(401/403)才停止；400 可能只是這個模型不支援某參數，換下一個模型繼續試
+                        if (err.status === 401 || err.status === 403) { authErr = true; return; }
                     }
                 }
             }
@@ -1232,7 +1245,9 @@
             loadingDiv.classList.add('hidden');
             if (!result) {
                 const e = lastErr || new Error('無可用模型');
-                e.authErr = authErr;
+                // 若錯誤訊息明顯與金鑰/權限有關，才標記為金鑰問題（顯示對應提示）
+                const em = (e.message || '').toLowerCase();
+                e.authErr = authErr || /api key not valid|api_key_invalid|invalid api key|permission|forbidden|unauthenticated|api key expired/i.test(em);
                 throw e;
             }
 
