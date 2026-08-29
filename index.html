@@ -85,6 +85,7 @@
                         <button id="menuCopy" onclick="copyChatLog(); closeMenu();" class="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 border-b border-gray-50 hidden">📋 <span>複製所有對話</span></button>
                         <button id="menuExport" onclick="exportChatLogCSV(); closeMenu();" class="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 border-b border-gray-50 hidden">⬇️ <span>匯出紀錄 CSV</span></button>
                         <button id="menuTts" onclick="toggleTTS();" class="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 hidden">🔊 <span id="menuTtsLabel">語音朗讀：開</span></button>
+                        <button id="menuOpenTab" class="w-full text-left px-4 py-3 text-sm text-indigo-700 hover:bg-indigo-50 flex items-center gap-2 border-t border-gray-100 hidden">↗️ <span>用新分頁開啟(語音用)</span></button>
                     </div>
                 </div>
             </div>
@@ -402,6 +403,8 @@
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         // iOS 上的 Chrome(CriOS)/Firefox(FxiOS)/Edge(EdgiOS) 的語音合成常常完全沒聲音，這是 iOS 平台限制
         const isIOSNonSafari = isIOS && /CriOS|FxiOS|EdgiOS/.test(navigator.userAgent);
+        // 是否被嵌在 iframe 裡（跨網域嵌入時麥克風/定位需父頁面用 allow 授權）
+        const inIframe = (function(){ try { return window.self !== window.top; } catch(e){ return true; } })();
         function pickVoice() {
             if (!('speechSynthesis' in window)) return;
             const voices = window.speechSynthesis.getVoices();
@@ -625,7 +628,12 @@
                 recognizing = false;
                 micBtn.classList.remove('mic-recording');
                 sttInterim = '';
-                if (ev && (ev.error === 'not-allowed' || ev.error === 'service-not-allowed')) micDenied = true;
+                if (ev && (ev.error === 'not-allowed' || ev.error === 'service-not-allowed')) {
+                    micDenied = true;
+                    if (inIframe) {
+                        showTip('此頁被嵌入於其他網站，麥克風被封鎖。請嵌入方在 iframe 加上 allow="microphone"，或改用「新分頁開啟」本頁', true);
+                    }
+                }
             };
 
             // 只請求一次麥克風授權：先用 getUserMedia 取得並「持有」串流
@@ -638,7 +646,9 @@
                     return true;
                 } catch(err) {
                     micDenied = true;
-                    return false;
+                    // 區分：iframe 權限政策擋掉 vs 使用者拒絕
+                    const policyBlocked = err && (err.name === 'NotAllowedError' || err.name === 'SecurityError') && inIframe;
+                    return { ok: false, policyBlocked: policyBlocked };
                 }
             }
 
@@ -647,8 +657,16 @@
                     recognition.stop();
                     return;
                 }
-                const ok = await ensureMicPermission();
-                if (!ok) { showTip('無法使用麥克風，請在瀏覽器允許麥克風權限', true); return; }
+                const res = await ensureMicPermission();
+                const ok = (res === true);
+                if (!ok) {
+                    if (res && res.policyBlocked) {
+                        showTip('此頁被嵌入於其他網站，麥克風被封鎖。請嵌入方在 iframe 加上 allow="microphone" 權限，或改用「新分頁開啟」本頁再使用語音輸入', true);
+                    } else {
+                        showTip('無法使用麥克風，請在瀏覽器允許麥克風權限', true);
+                    }
+                    return;
+                }
                 justSent = false;
                 sttInterim = '';
                 try { recognition.start(); recognizing = true; micBtn.classList.add('mic-recording'); } catch(e){}
@@ -687,6 +705,16 @@
             if (CONFIG.allowExportLog) document.getElementById('menuExport').classList.remove('hidden');
             if (CONFIG.allowCopyLog) document.getElementById('menuCopy').classList.remove('hidden');
 
+            // 被嵌入 iframe 且有用到語音/定位時，提供「用新分頁開啟」的保險選項
+            const usesDevice = (CONFIG.tts && CONFIG.tts.enabled) || CONFIG.sttEnabled || (CONFIG.gpsPoints && CONFIG.gpsPoints.length);
+            if (inIframe && usesDevice) {
+                const mo = document.getElementById('menuOpenTab');
+                if (mo) {
+                    mo.classList.remove('hidden');
+                    mo.onclick = () => { try { window.open(location.href, '_blank', 'noopener'); } catch(e){} closeMenu(); };
+                }
+            }
+
             // 功能5：若有歷史紀錄則重播，否則顯示開場白
             if (chatLog.length > 0) {
                 chatLog.forEach(m => { appendMessage(m.role === 'player' ? 'user' : 'model', m.text, null, true); });
@@ -696,6 +724,8 @@
                 logMessage('npc', CONFIG.npcName, greeting);
             }
             startProactive();            // 功能7
+            // 背景預先查詢可用模型清單（不阻塞回覆），萬一主要模型失效時 fallback 會更快
+            setTimeout(() => { try { discoverModels(); } catch(e){} }, 1500);
         };
 
         /* ===== 功能7：主動發言 ===== */
@@ -840,13 +870,19 @@
             if (role === 'model' && CONFIG.typewriterEnabled && !skipTypewriter) {
                 return new Promise(resolve => {
                     let i = 0;
-                    const speed = CONFIG.typewriterSpeed;
+                    // 打字機速度：長訊息時自動加快，避免整體等太久（總時長上限約 2.5 秒）
+                    let speed = CONFIG.typewriterSpeed;
+                    const maxTotal = 2500;
+                    if (text.length * speed > maxTotal) speed = Math.max(6, Math.floor(maxTotal / text.length));
+                    const step = speed < 12 ? 2 : 1;   // 很快時一次補多個字，減少 setInterval 負擔
                     const interval = setInterval(() => {
                         if (i < text.length) {
-                            const char = text.charAt(i);
-                            if (char === '\n') contentDiv.appendChild(document.createElement('br'));
-                            else contentDiv.appendChild(document.createTextNode(char));
-                            i++;
+                            for (let k = 0; k < step && i < text.length; k++) {
+                                const char = text.charAt(i);
+                                if (char === '\n') contentDiv.appendChild(document.createElement('br'));
+                                else contentDiv.appendChild(document.createTextNode(char));
+                                i++;
+                            }
                             scrollToBottom();
                         } else {
                             clearInterval(interval);
@@ -1116,32 +1152,44 @@
                 generationConfig: { temperature: CONFIG.temperature }
             };
 
-            // 組合要嘗試的模型清單：上次成功的 → 設計者清單 → 即時查詢到的可用清單
+            // 先用「已知可用」的模型清單直接嘗試，不要每次都先去查詢模型清單（那會多一次網路往返、拖慢每次回覆）
             let candidates = [workingModel].concat((CONFIG.models || []).filter(m => m !== workingModel));
-            const discovered = await discoverModels();   // 向 Google 問實際可用清單
-            if (discovered && discovered.length) {
-                discovered.forEach(m => { if (!candidates.includes(m)) candidates.push(m); });
-            }
 
             let result = null;
             let lastErr = null;
             let authErr = false;
-            for (const model of candidates) {
-                try {
-                    const r = await callModel(model, payload);
-                    const cand = r.candidates && r.candidates[0];
-                    if (cand && cand.content && cand.content.parts && cand.content.parts[0] && cand.content.parts[0].text) {
-                        result = r;
-                        workingModel = model;   // 記住這個可用模型，下次優先用
-                        break;
-                    } else {
-                        // 可能是被安全機制擋掉或空回覆
-                        lastErr = new Error((cand && cand.finishReason) ? ('回覆被中止：' + cand.finishReason) : '模型回傳空內容');
+            let triedDiscovery = false;
+
+            async function tryModels(list) {
+                for (const model of list) {
+                    if (result) break;
+                    try {
+                        const r = await callModel(model, payload);
+                        const cand = r.candidates && r.candidates[0];
+                        if (cand && cand.content && cand.content.parts && cand.content.parts[0] && cand.content.parts[0].text) {
+                            result = r;
+                            workingModel = model;   // 記住這個可用模型，下次優先用
+                            return;
+                        } else {
+                            lastErr = new Error((cand && cand.finishReason) ? ('回覆被中止：' + cand.finishReason) : '模型回傳空內容');
+                        }
+                    } catch (err) {
+                        lastErr = err;
+                        if (err.status === 400 || err.status === 401 || err.status === 403) { authErr = true; return; }
                     }
-                } catch (err) {
-                    lastErr = err;
-                    // API Key 無效 / 權限問題 → 不用再換模型了
-                    if (err.status === 400 || err.status === 401 || err.status === 403) { authErr = true; break; }
+                }
+            }
+
+            // 第一輪：直接打已知模型（正常情況一次就成功）
+            await tryModels(candidates);
+
+            // 只有在已知模型全部失敗、且非金鑰問題時，才即時查詢可用模型清單再試一次
+            if (!result && !authErr) {
+                triedDiscovery = true;
+                const discovered = await discoverModels();
+                if (discovered && discovered.length) {
+                    const extra = discovered.filter(m => !candidates.includes(m));
+                    await tryModels(extra);
                 }
             }
 
