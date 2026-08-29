@@ -1014,17 +1014,26 @@
             }
         }
 
-        // 呼叫單一模型（含 429 稍候重試一次同模型）
+        // 呼叫單一模型（含 429 稍候重試一次同模型；若模型不支援 thinkingConfig 就拿掉再試）
         async function callModel(model, payload) {
             const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + CONFIG.apiKey;
-            let response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            async function doFetch(body) {
+                return fetch(apiUrl, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+            }
+            let response = await doFetch(payload);
             if (response.status === 429) {
                 await new Promise(r => setTimeout(r, 1200));
-                response = await fetch(apiUrl, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+                response = await doFetch(payload);
+            }
+            // 某些模型(如部分 3.x/lite)不接受 thinkingConfig 或該數值 → 拿掉後重試一次
+            if (response.status === 400 && payload.generationConfig && payload.generationConfig.thinkingConfig) {
+                const errText = await response.clone().json().catch(() => ({}));
+                const msg = (errText.error && errText.error.message) || '';
+                if (/thinking|thinkingConfig|thinkingBudget|generationConfig/i.test(msg)) {
+                    const p2 = JSON.parse(JSON.stringify(payload));
+                    delete p2.generationConfig.thinkingConfig;
+                    response = await doFetch(p2);
+                }
             }
             if (!response.ok) {
                 const e = await response.json().catch(() => ({}));
@@ -1149,7 +1158,13 @@
             const payload = {
                 contents: contents,
                 systemInstruction: { parts: [{ text: finalSystemPrompt }] },
-                generationConfig: { temperature: CONFIG.temperature }
+                generationConfig: {
+                    temperature: CONFIG.temperature,
+                    // 關閉「思考模式」：Gemini 2.5+ 預設會先內部推理再回覆，會明顯變慢。
+                    // 對話型 NPC 不需要，關掉可大幅降低延遲（官方建議 thinkingBudget:0）。
+                    thinkingConfig: { thinkingBudget: 0 },
+                    maxOutputTokens: 800
+                }
             };
 
             // 先用「已知可用」的模型清單直接嘗試，不要每次都先去查詢模型清單（那會多一次網路往返、拖慢每次回覆）
