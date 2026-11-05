@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>看見彼此 · SEL 對話準則參考手冊</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#2b2622;
+    --ink-soft:#5c544c;
+    --paper:#f6f1e9;
+    --paper-card:#fffdf9;
+    --line:#e3d9c8;
+    --dusk:#c2663f;      /* 傍晚暖陽 — 主色 */
+    --dusk-deep:#9c4a2a;
+    --sky:#6b7f8d;       /* 黃昏天空藍灰 */
+    --leaf:#6b8464;      /* 沉穩綠 — 正向 */
+    --warn:#b06a3a;      /* 提醒 */
+    --gold:#caa25a;
+    --serif:'Noto Serif TC',serif;
+    --sans:'Noto Sans TC',sans-serif;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;scroll-padding-top:20px;}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:var(--sans);line-height:1.8;
+    font-size:17px;
+  }
+  .wrap{max-width:860px;margin:0 auto;padding:0 22px 90px;}
+
+  /* ---------- 封面 ---------- */
+  .cover{
+    position:relative;margin:0 -22px 48px;padding:70px 34px 58px;
+    background:
+      radial-gradient(120% 90% at 78% 0%, rgba(194,102,63,.26), transparent 60%),
+      radial-gradient(130% 100% at 10% 110%, rgba(107,127,141,.30), transparent 55%),
+      linear-gradient(160deg,#3a3330,#241f1c);
+    color:#f6ede0;overflow:hidden;
+  }
+  .cover::after{
+    content:"";position:absolute;left:0;right:0;bottom:0;height:3px;
+    background:linear-gradient(90deg,var(--dusk),var(--gold),var(--sky));
+  }
+  .cover .kicker{
+    font-family:var(--serif);font-weight:500;letter-spacing:.18em;
+    font-size:15px;color:#e7c9a6;opacity:.9;margin:0 0 18px;
+  }
+  .cover h1{
+    font-family:var(--serif);font-weight:900;
+    font-size:clamp(34px,7vw,56px);line-height:1.12;margin:0 0 6px;
+    letter-spacing:.01em;
+  }
+  .cover h1 .sub{display:block;font-size:clamp(17px,3.4vw,23px);font-weight:500;color:#e7c9a6;margin-top:14px;letter-spacing:.04em;}
+  .cover p.lead{
+    max-width:540px;margin:26px 0 0;font-size:16.5px;line-height:1.95;color:#efe4d5;
+  }
+  .cover .tag{
+    display:inline-block;margin-top:30px;padding:7px 16px;border:1px solid rgba(231,201,166,.5);
+    border-radius:40px;font-size:13.5px;letter-spacing:.05em;color:#e7c9a6;
+  }
+
+  /* ---------- 區塊共用 ---------- */
+  section{margin:0 0 54px;}
+  .eyebrow-row{display:flex;align-items:baseline;gap:14px;margin:0 0 20px;padding-bottom:12px;border-bottom:2px solid var(--line);}
+  .eyebrow-row .no{
+    font-family:var(--serif);font-weight:900;font-size:30px;color:var(--dusk);line-height:1;flex:0 0 auto;
+  }
+  .eyebrow-row h2{font-family:var(--serif);font-weight:700;font-size:25px;margin:0;color:var(--ink);}
+  .eyebrow-row .en{margin-left:auto;font-size:12.5px;color:var(--ink-soft);letter-spacing:.12em;opacity:.75;align-self:flex-end;}
+  p{margin:0 0 16px;}
+  .intro-p{font-size:17.5px;color:var(--ink-soft);}
+  strong{color:var(--dusk-deep);font-weight:700;}
+  .serif-quote{
+    font-family:var(--serif);font-size:20px;line-height:1.9;color:var(--ink);
+    border-left:4px solid var(--gold);padding:4px 0 4px 22px;margin:22px 0;font-weight:500;
+  }
+
+  /* ---------- 五大能力卡 ---------- */
+  .casel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:8px;}
+  .casel-card{
+    background:var(--paper-card);border:1px solid var(--line);border-radius:14px;padding:22px 20px;
+    position:relative;overflow:hidden;
+  }
+  .casel-card::before{content:"";position:absolute;top:0;left:0;width:100%;height:4px;background:var(--c,var(--dusk));}
+  .casel-card .ic{font-size:26px;line-height:1;margin-bottom:12px;}
+  .casel-card h3{font-family:var(--serif);font-size:19px;margin:0 0 3px;color:var(--ink);}
+  .casel-card .en2{font-size:11.5px;letter-spacing:.08em;color:var(--ink-soft);opacity:.7;margin-bottom:12px;}
+  .casel-card p{font-size:14.5px;line-height:1.75;color:var(--ink-soft);margin:0;}
+  .casel-card .q{margin-top:14px;font-size:13.5px;color:var(--dusk-deep);font-weight:500;border-top:1px dashed var(--line);padding-top:12px;}
+
+  /* ---------- 四步驟 ---------- */
+  .steps{counter-reset:st;margin-top:10px;}
+  .step{
+    display:flex;gap:20px;align-items:flex-start;background:var(--paper-card);
+    border:1px solid var(--line);border-radius:14px;padding:22px 22px;margin-bottom:14px;position:relative;
+  }
+  .step .n{
+    flex:0 0 auto;width:48px;height:48px;border-radius:50%;
+    background:linear-gradient(145deg,var(--dusk),var(--dusk-deep));color:#fff;
+    font-family:var(--serif);font-weight:900;font-size:22px;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(156,74,42,.28);
+  }
+  .step .body h3{font-family:var(--serif);font-size:19px;margin:2px 0 7px;color:var(--ink);}
+  .step .body p{margin:0 0 10px;font-size:15.5px;color:var(--ink-soft);}
+  .step .body .ex{font-size:14.5px;color:var(--leaf);background:rgba(107,132,100,.1);border-radius:8px;padding:9px 13px;}
+  .step .body .ex b{color:var(--leaf);}
+
+  /* ---------- 要領 do/dont ---------- */
+  .pillar{margin-bottom:34px;}
+  .pillar > h3{
+    font-family:var(--serif);font-size:20px;color:var(--ink);margin:0 0 4px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .pillar > h3 .dot{width:11px;height:11px;border-radius:50%;background:var(--dusk);flex:0 0 auto;}
+  .pillar > .why{font-size:15px;color:var(--ink-soft);margin:0 0 16px;padding-left:21px;}
+  .dd{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .dd .col{border-radius:13px;padding:17px 18px;border:1px solid var(--line);}
+  .dd .yes{background:rgba(107,132,100,.09);border-color:rgba(107,132,100,.35);}
+  .dd .no{background:rgba(176,106,58,.08);border-color:rgba(176,106,58,.32);}
+  .dd .col .lab{font-weight:700;font-size:14px;letter-spacing:.03em;margin-bottom:11px;display:flex;align-items:center;gap:7px;}
+  .dd .yes .lab{color:var(--leaf);}
+  .dd .no .lab{color:var(--warn);}
+  .dd ul{margin:0;padding:0;list-style:none;}
+  .dd li{font-size:14.5px;line-height:1.7;padding:6px 0 6px 20px;position:relative;color:var(--ink);}
+  .dd .yes li::before{content:"✓";position:absolute;left:0;color:var(--leaf);font-weight:700;}
+  .dd .no li::before{content:"✕";position:absolute;left:0;color:var(--warn);font-weight:700;}
+
+  /* ---------- 隱形陷阱 ---------- */
+  .traps{display:grid;gap:14px;margin-top:8px;}
+  .trap{
+    background:var(--paper-card);border:1px solid var(--line);border-left:5px solid var(--warn);
+    border-radius:12px;padding:18px 20px;
+  }
+  .trap .t{font-family:var(--serif);font-weight:700;font-size:17px;color:var(--warn);margin:0 0 7px;}
+  .trap p{margin:0;font-size:15px;color:var(--ink-soft);}
+  .trap .fix{margin-top:11px;font-size:14.5px;color:var(--leaf);border-top:1px dashed var(--line);padding-top:10px;}
+  .trap .fix b{color:var(--leaf);}
+
+  /* ---------- 自問清單 ---------- */
+  .checklist{background:linear-gradient(160deg,#fffdf9,#f3ebdd);border:1px solid var(--line);border-radius:16px;padding:28px 26px;}
+  .checklist h3{font-family:var(--serif);font-size:20px;margin:0 0 16px;color:var(--dusk-deep);}
+  .checklist ul{margin:0;padding:0;list-style:none;}
+  .checklist li{font-size:16px;line-height:1.7;padding:10px 0 10px 34px;position:relative;border-bottom:1px dashed var(--line);}
+  .checklist li:last-child{border-bottom:none;}
+  .checklist li::before{content:"☐";position:absolute;left:0;top:8px;font-size:19px;color:var(--dusk);}
+
+  /* ---------- 結語 ---------- */
+  .closing{text-align:center;padding:44px 24px;background:
+    radial-gradient(100% 120% at 50% 0%, rgba(194,102,63,.12), transparent 60%);
+    border-top:2px solid var(--line);margin-top:10px;}
+  .closing .big{font-family:var(--serif);font-weight:700;font-size:clamp(22px,4.5vw,30px);line-height:1.6;color:var(--ink);max-width:620px;margin:0 auto 14px;}
+  .closing .small{font-size:15px;color:var(--ink-soft);}
+
+  footer{text-align:center;font-size:12.5px;color:var(--ink-soft);opacity:.7;margin-top:46px;padding-top:20px;border-top:1px solid var(--line);}
+
+  @media (max-width:620px){
+    body{font-size:16px;}
+    .dd{grid-template-columns:1fr;}
+    .eyebrow-row .en{display:none;}
+    .step{gap:14px;padding:18px 16px;}
+    .step .n{width:40px;height:40px;font-size:18px;}
+  }
+
+  @media print{
+    body{background:#fff;font-size:12pt;}
+    .cover{background:#2b2622!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .casel-card,.step,.trap,.checklist{-webkit-print-color-adjust:exact;print-color-adjust:exact;break-inside:avoid;}
+    section{break-inside:avoid;}
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ink:#ece4d8;--ink-soft:#b3a996;--paper:#231f1c;--paper-card:#2c2723;
+      --line:#443c33;--dusk:#d98a5f;--dusk-deep:#e8a376;--gold:#d4b36e;--leaf:#8fae86;--warn:#d4915f;
+    }
+    @media not print{body{background:var(--paper);}}
+  }
+
+  /* ---------- 文獻強化版新增 ---------- */
+  .cite{font-size:.86em;color:var(--sky);white-space:nowrap;}
+  .th,.theory{font-size:13.5px;line-height:1.75;color:var(--ink-soft);background:rgba(107,127,141,.1);border-left:3px solid var(--sky);border-radius:6px;padding:9px 12px;margin-top:12px;}
+  .casel-card .th{font-size:12.5px;line-height:1.65;}
+  .theory{margin-top:14px;font-size:14px;}
+  .evidence{background:var(--paper-card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-top:26px;}
+  .evidence h4{font-family:var(--serif);font-size:18px;margin:0 0 10px;color:var(--dusk-deep);}
+  .evidence ul{margin:0;padding-left:20px;}
+  .evidence li{font-size:15px;line-height:1.75;margin-bottom:8px;color:var(--ink-soft);}
+  .rw{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--paper-card);}
+  .rw-h,.rw-r{display:grid;grid-template-columns:1fr 1.15fr 1.1fr;gap:12px;padding:12px 16px;font-size:14.5px;line-height:1.65;}
+  .rw-h{background:rgba(194,102,63,.12);font-weight:700;color:var(--dusk-deep);font-size:13.5px;}
+  .rw-r{border-top:1px solid var(--line);}
+  .rw .bad{color:var(--warn);} .rw .good{color:var(--leaf);font-weight:500;} .rw .why2{color:var(--ink-soft);font-size:13.5px;}
+  .disc{display:grid;gap:10px;}
+  .disc div{background:var(--paper-card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;font-size:15.5px;line-height:1.75;}
+  .note{font-size:14px;color:var(--warn);background:rgba(176,106,58,.09);border-radius:8px;padding:10px 14px;}
+  .refs{padding-left:24px;margin:0;}
+  .refs li{font-size:13.5px;line-height:1.7;margin-bottom:9px;color:var(--ink-soft);padding-left:4px;word-break:break-word;}
+  @media (max-width:620px){
+    .rw-h{display:none;}
+    .rw-r{grid-template-columns:1fr;gap:4px;}
+  }
+  .flag{color:var(--warn);font-weight:700;cursor:help;}
+  .legend{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px;}
+
+  /* ---------- 插圖 ---------- */
+  .banner{margin:0 0 22px;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:linear-gradient(180deg,rgba(194,102,63,.10),rgba(202,162,90,.20));}
+  .banner svg{display:block;width:100%;height:auto;}
+  .cover > *:not(.cover-art){position:relative;z-index:1;}
+  .cover-art{-webkit-mask-image:linear-gradient(90deg,transparent,#000 28%);mask-image:linear-gradient(90deg,transparent,#000 28%);position:absolute;right:0;bottom:3px;width:min(54%,460px);z-index:0;pointer-events:none;}
+  .closing svg{display:block;width:min(100%,560px);height:auto;margin:0 auto 18px;}
+  @media (prefers-reduced-motion:no-preference){
+    .float{animation:fl 4s ease-in-out infinite;}
+    .float2{animation:fl 5s ease-in-out -2s infinite;}
+    @keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+  }
+  @media (max-width:620px){.cover-art{width:78%;opacity:.35;}}
+
+  details.more{margin-top:12px;}
+  details.more > summary{cursor:pointer;font-size:13.5px;font-weight:500;color:var(--sky);list-style:none;display:inline-block;padding:3px 10px;border:1px dashed var(--sky);border-radius:20px;}
+  details.more > summary::-webkit-details-marker{display:none;}
+  details.more > summary::before{content:"▸ ";}
+  details.more[open] > summary::before{content:"▾ ";}
+  details.more > .th,details.more > .theory{margin-top:8px;}
+  .ref{font-size:.72em;line-height:0;margin-left:1px;}
+  .ref a{color:var(--sky);text-decoration:none;font-weight:700;padding:0 1px;}
+  .ref a:hover{text-decoration:underline;}
+  .refs li:target{background:rgba(202,162,90,.22);border-radius:6px;}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="person" viewBox="0 0 40 70"><circle cx="20" cy="14" r="11" fill="currentColor"/><path d="M4 70C4 40 10 30 20 30S36 40 36 70Z" fill="currentColor"/></symbol>
+    <symbol id="heart" viewBox="0 0 24 22"><path d="M12 21C-6 8 4-3 12 5c8-8 18 3 0 16z" fill="currentColor"/></symbol>
+    <symbol id="bubble" viewBox="0 0 60 46"><path d="M8 2h44a6 6 0 0 1 6 6v20a6 6 0 0 1-6 6H26l-10 10v-10H8a6 6 0 0 1-6-6V8a6 6 0 0 1 6-6z" fill="currentColor"/></symbol>
+    <symbol id="scene" viewBox="0 0 800 110"><circle cx="650" cy="42" r="28" fill="var(--gold)" opacity=".55"/><path d="M0 110V84C150 60 280 98 420 80S680 58 800 82V110Z" fill="var(--leaf)" opacity=".25"/><path d="M0 110V96C200 80 420 108 800 92V110Z" fill="var(--sky)" opacity=".25"/></symbol>
+  </defs>
+</svg>
+
+<div class="cover">
+  <svg class="cover-art" viewBox="0 0 460 250" aria-hidden="true"><circle cx="330" cy="105" r="62" fill="#e7b36a" opacity=".35"/><circle cx="330" cy="105" r="38" fill="#e7b36a" opacity=".6"/><path d="M0 250V190C90 160 170 205 260 180S400 160 460 185V250Z" fill="#6b8464" opacity=".5"/><path d="M0 250V220C130 200 300 245 460 215V250Z" fill="#6b7f8d" opacity=".5"/><use href="#person" x="150" y="118" width="46" height="80" style="color:#9fb3c0"/><use href="#person" x="235" y="118" width="46" height="80" style="color:#e08a5c"/><use href="#bubble" x="112" y="52" width="84" height="64" style="color:#f6ede0;opacity:.9"/><use href="#bubble" x="236" y="52" width="84" height="64" style="color:#caa25a"/><use class="float" href="#heart" x="262" y="68" width="30" height="28" style="color:#fff8ee"/><use class="float2" href="#heart" x="340" y="30" width="18" height="17" style="color:#e08a5c"/></svg>
+  <p class="kicker">看見彼此 · 社會情緒學習（SEL）</p>
+  <h1>同理對話準則
+    <span class="sub">邊玩邊讀的溝通鷹架手冊</span>
+  </h1>
+  <p class="lead">這本小手冊不會告訴你「哪個選項是對的」。它要給你的，是一副看待對話的眼鏡——每一條準則都附上背後的研究與理論，讓你知道「為什麼這樣說比較好」，而不只是「要這樣說」。</p>
+  <span class="tag">適合：玩遊戲時隨手翻閱 · 課堂討論 · 自我練習</span>
+</div>
+
+<div class="wrap">
+
+  <section id="what">
+    <div class="eyebrow-row"><span class="no">壹</span><h2>先認識 SEL：為什麼要學「好好說話」</h2><span class="en">What is SEL</span></div>
+    <div class="banner"><svg viewBox="0 0 800 110" role="img" aria-label="兩個人用對話彼此靠近"><use href="#scene"/><use href="#person" x="335" y="40" width="30" height="52" style="color:var(--sky)"/><use href="#person" x="435" y="40" width="30" height="52" style="color:var(--dusk)"/><use href="#bubble" x="300" y="2" width="56" height="42" style="color:var(--gold)"/><use href="#bubble" x="440" y="2" width="56" height="42" style="color:var(--leaf)"/><use class="float" href="#heart" x="461" y="13" width="18" height="16" style="color:#fffdf9"/></svg></div>
+    <p class="intro-p"><strong>社會情緒學習（Social and Emotional Learning，SEL）</strong>，是個人透過學習，認識與管理情緒、設定並達成目標、感受並展現對他人的同理、建立並維持正向關係，以及做出負責任決定的歷程<sup class="ref"><a href="#ref-1" title="CASEL, 2024">1</a></sup>。近年 SEL 已被視為教育的核心主軸之一，並強調應融入日常教學與師生關係，而非只是單次課程<sup class="ref"><a href="#ref-2" title="Mahoney et al., 2021">2</a></sup>。</p>
+    <p class="serif-quote">好的對話，不是贏過對方，<br>而是讓兩個人都覺得「我被聽見了」。</p>
+    <p>在《看見彼此》裡，每一次與媽媽、小潔、阿凱、爸爸的對話，都是一次 SEL 的練習。這份手冊整理 <strong>CASEL 五大核心能力</strong>，並把常見的同理對話技巧連回心理學與教育研究。</p>
+
+  </section>
+
+  <section id="casel">
+    <div class="eyebrow-row"><span class="no">貳</span><h2>SEL 五大核心能力</h2><span class="en">CASEL 5 Core Competencies</span></div>
+    <div class="banner"><svg viewBox="0 0 800 110" role="img" aria-label="五盞代表五大能力的燈"><use href="#scene"/><path d="M240 58H560" stroke="var(--line)" stroke-width="3"/><circle cx="240" cy="58" r="27" fill="var(--dusk)" opacity=".2"/><circle cx="240" cy="58" r="15" fill="var(--dusk)"/><circle cx="320" cy="58" r="27" fill="var(--sky)" opacity=".2"/><circle cx="320" cy="58" r="15" fill="var(--sky)"/><circle cx="400" cy="58" r="27" fill="var(--leaf)" opacity=".2"/><circle cx="400" cy="58" r="15" fill="var(--leaf)"/><circle cx="480" cy="58" r="27" fill="var(--gold)" opacity=".2"/><circle cx="480" cy="58" r="15" fill="var(--gold)"/><circle cx="560" cy="58" r="27" fill="var(--dusk-deep)" opacity=".2"/><circle cx="560" cy="58" r="15" fill="var(--dusk-deep)"/></svg></div>
+    <p class="intro-p">這五種能力像五盞燈，照亮對話裡不同的角落<sup class="ref"><a href="#ref-1" title="CASEL, 2024">1</a></sup>。玩遊戲時可以想想：此刻這句話，點亮了哪一盞？每張卡片下方標出了它的理論根基。</p>
+    <div class="casel-grid">
+      <div class="casel-card" style="--c:#c2663f">
+        <div class="ic">🪞</div>
+        <h3>自我覺察</h3>
+        <div class="en2">Self-Awareness</div>
+        <p>察覺自己當下的情緒、需要與限制。知道「我現在其實很緊張／害怕被誤會」，而不是被情緒牽著走卻不自知。</p>
+        <div class="q">練習問自己：我現在的感受，是什麼？</div>
+        <details class="more"><summary>📖 理論與文獻</summary><div class="th">📖 青少年期是情緒調節能力快速發展的階段，也是練習「覺察→調節」的好時機<sup class="ref"><a href="#ref-6" title="Silvers, 2022">6</a></sup>。</div></details>
+      </div>
+      <div class="casel-card" style="--c:#6b7f8d">
+        <div class="ic">🌊</div>
+        <h3>自我管理</h3>
+        <div class="en2">Self-Management</div>
+        <p>在情緒湧上時，能先穩住自己——深呼吸、暫停一下，不讓衝動的話脫口而出，再選擇怎麼回應。</p>
+        <div class="q">練習：先暫停三秒，再開口。</div>
+        <details class="more"><summary>📖 理論與文獻</summary><div class="th">📖 情緒調節策略（如重新看待情境）是可以學習與練習的<sup class="ref"><a href="#ref-6" title="Silvers, 2022">6</a></sup>；校園 SEL 方案對相關技能有正向效果<sup class="ref"><a href="#ref-3" title="Cipriano et al., 2023">3</a></sup>。</div></details>
+      </div>
+      <div class="casel-card" style="--c:#6b8464">
+        <div class="ic">💛</div>
+        <h3>社會覺察</h3>
+        <div class="en2">Social Awareness · 同理心</div>
+        <p>讀懂對方的情緒與處境，試著站到對方的位置去看事情（觀點取替）。看見「他兇，可能是因為他也在害怕」。</p>
+        <div class="q">練習問：如果我是他，會怎麼想？</div>
+        <details class="more"><summary>📖 理論與文獻</summary><div class="th">📖 同理心並非固定不變的特質，人是否願意投入同理，會受動機與信念影響，也可以透過練習提升<sup class="ref"><a href="#ref-7" title="Weisz et al., 2021">7</a></sup>。</div></details>
+      </div>
+      <div class="casel-card" style="--c:#caa25a">
+        <div class="ic">🤝</div>
+        <h3>人際技巧</h3>
+        <div class="en2">Relationship Skills · 溝通</div>
+        <p>用傾聽、表達感受、尋求支持與合作，維繫一段關係。知道怎麼主動修復、怎麼陪伴、怎麼溫柔地設下界線。</p>
+        <div class="q">練習：說「我」的感受，而不是指責「你」。</div>
+        <details class="more"><summary>📖 理論與文獻</summary><div class="th">📖 傾聽的品質會影響說話者的感受與關係<sup class="ref"><a href="#ref-8" title="Kluger & Itzchakov, 2022">8</a></sup>；「我訊息」與觀察—感受—需要—請求的表達架構則源自 Gordon（1970）與 Rosenberg（2003）。</div></details>
+      </div>
+      <div class="casel-card" style="--c:#9c4a2a">
+        <div class="ic">🧭</div>
+        <h3>負責任的決定</h3>
+        <div class="en2">Responsible Decision-Making</div>
+        <p>在為別人做事之前，先問對方的意願；考慮後果，和對方一起找辦法，而不是替他決定、擅自行動。</p>
+        <div class="q">練習問：你希望我怎麼做？</div>
+        <details class="more"><summary>📖 理論與文獻</summary><div class="th">📖 支持自主（autonomy-supportive）的互動方式，與較佳的動機與投入有關<sup class="ref"><a href="#ref-11" title="Reeve & Cheon, 2021">11</a></sup>；先徵詢意願再給建議是動機式晤談的核心<sup class="ref"><a href="#ref-12" title="Miller & Rollnick, 2023">12</a></sup>。</div></details>
+      </div>
+    </div>
+  </section>
+
+  <section id="empathy">
+    <div class="eyebrow-row"><span class="no">參</span><h2>同理心不只一種</h2><span class="en">Facets of Empathy</span></div>
+    <div class="banner"><svg viewBox="0 0 800 110" role="img" aria-label="站到對方的位置去理解他"><use href="#scene"/><use href="#person" x="345" y="42" width="29" height="50" style="color:var(--sky)"/><use href="#person" x="430" y="42" width="29" height="50" style="color:var(--dusk)"/><use class="float" href="#heart" x="388" y="50" width="24" height="22" style="color:var(--warn)"/><circle cx="372" cy="30" r="3" fill="var(--sky)"/><circle cx="362" cy="22" r="5" fill="var(--sky)"/><ellipse cx="342" cy="10" rx="22" ry="11" fill="var(--sky)" opacity=".6"/></svg></div>
+    <p class="intro-p">「同理」常被說成一件事，但概念上可拆成「理解他人想法」「感受他人情緒」「想幫助對方」幾個相關卻不同的部分<sup class="ref"><a href="#ref-13" title="Cuff et al., 2016">13</a>,<a href="#ref-14" title="Davis, 1983">14</a></sup>。知道自己用的是哪一種，對話會更精準。近年研究也指出，同理是可以透過動機與練習增進的<sup class="ref"><a href="#ref-7" title="Weisz et al., 2021">7</a></sup>。</p>
+    <div class="casel-grid">
+      <div class="casel-card" style="--c:#6b8464"><h3>認知同理</h3><div class="en2">Perspective Taking</div><p>理解「他為什麼這樣想、這樣做」。重點是理解，不一定要認同。</p><div class="q">例：「你不是不想說，是怕我們失望。」</div></div>
+      <div class="casel-card" style="--c:#c2663f"><h3>情感共鳴</h3><div class="en2">Affective Sharing</div><p>感受到對方的情緒，彷彿自己也跟著難過。但若被淹沒（個人困擾），反而會想逃開。</p><div class="q">提醒：先穩住自己，才幫得上對方。</div></div>
+      <div class="casel-card" style="--c:#caa25a"><h3>同情關懷</h3><div class="en2">Empathic Concern</div><p>想為對方做點什麼的溫暖動機，是從「感受」走向「行動」的橋。</p><div class="q">例：「我在這裡，需要我做什麼嗎？」</div></div>
+    </div>
+    <p style="margin-top:18px">研究也提醒我們：人們常低估他人願意深入交談的程度，因而停留在淺層話題，不敢多問<sup class="ref"><a href="#ref-15" title="Kardas et al., 2022">15</a></sup>。這正是「不要自己猜，直接問」與「承認我不完全懂」如此重要的原因。</p>
+  </section>
+
+  <section id="steps">
+    <div class="eyebrow-row"><span class="no">肆</span><h2>同理對話的四個步驟</h2><span class="en">4 Steps of Empathy</span></div>
+    <div class="banner"><svg viewBox="0 0 800 110" role="img" aria-label="一步一步靠近對方"><use href="#scene"/><g fill="var(--dusk)"><rect x="250" y="96" width="82" height="14" opacity="0.45"/><rect x="332" y="82" width="82" height="28" opacity="0.6"/><rect x="414" y="68" width="82" height="42" opacity="0.75"/><rect x="496" y="54" width="82" height="56" opacity="0.95"/></g><use href="#person" x="522" y="10" width="27" height="44" style="color:var(--dusk-deep)"/></svg></div>
+    <p class="intro-p">當對方正在難過、生氣或沉默時，這四步是最可靠的順序。原則是：<strong>先接住情緒，再處理事情</strong>。這個順序源自「情緒教練」的實務概念<sup class="ref"><a href="#ref-16" title="Gottman et al., 1996">16</a></sup>，也呼應 SEL 把情緒覺察放在問題解決之前的設計<sup class="ref"><a href="#ref-1" title="CASEL, 2024">1</a></sup>。</p>
+    <div class="steps">
+      <div class="step">
+        <div class="n">1</div>
+        <div class="body">
+          <h3>先接住情緒，不急著講道理</h3>
+          <p>人在情緒裡的時候，是聽不進道理的。先讓對方知道「你的感受我收到了」，比任何建議都重要。急著解決問題，反而像在說「你的感受不重要」。</p>
+          <div class="ex"><b>可以這樣開場：</b>「你看起來很累／很難過，還好嗎？」「這件事一定讓你很不好受。」</div>
+          <details class="more"><summary>📖 理論與文獻</summary><div class="th">📖 <b>理論依據：</b>「先肯定感受再談事情」是經典的支持性溝通原則<sup class="ref"><a href="#ref-17" title="Burleson, 2003">17</a>,<a href="#ref-18" title="Rogers, 1957">18</a></sup>。近期關於傾聽的回顧指出，被認真傾聽的人較少防衛，也更能自我探索<sup class="ref"><a href="#ref-8" title="Kluger & Itzchakov, 2022">8</a></sup>。</div></details>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">2</div>
+        <div class="body">
+          <h3>不替對方下定論</h3>
+          <p>就算你覺得自己很懂，也先別說「我知道一定是……」。你不在現場，不了解全貌。替對方把話講完、把結論下好，會讓他覺得不被尊重，反而關上心門。</p>
+          <div class="ex"><b>把判斷換成好奇：</b>「我不知道發生什麼，但我想聽你說。」「可以多告訴我一點嗎？」</div>
+          <details class="more"><summary>📖 理論與文獻</summary><div class="th">📖 <b>理論依據：</b>人們常因怕冒犯或自以為了解而不敢多問<sup class="ref"><a href="#ref-15" title="Kardas et al., 2022">15</a></sup>；高品質傾聽的特徵包括專注、不急著評判、不打斷<sup class="ref"><a href="#ref-8" title="Kluger & Itzchakov, 2022">8</a></sup>。</div></details>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <div class="body">
+          <h3>說出自己的感受，而不是指責</h3>
+          <p>想表達立場時，用「我」開頭，說自己的感覺；而不是用「你」開頭去指責。「我也很怕讓你失望」比「你每次都誤會我」更能打開對話，因為前者不會讓對方立刻防衛。</p>
+          <div class="ex"><b>我訊息：</b>「我其實也很擔心……」　<b>而非：</b>「你根本不懂！」<br><b>完整版（Rosenberg）：</b>「當我看到＿＿（觀察），我覺得＿＿（感受），因為我需要＿＿（需要），可以請你＿＿嗎（請求）？」</div>
+          <details class="more"><summary>📖 理論與文獻</summary><div class="th">📖 <b>理論依據：</b>「我訊息」由 Gordon（1970）提出，目的在描述自己的感受而不貶低對方；Rosenberg（2003）的非暴力溝通將其發展為觀察、感受、需要、請求四要素。需留意這兩者屬實務取向的溝通模型，嚴謹的實證檢驗相對有限，宜視為可練習的溝通技巧。</div></details>
+        </div>
+      </div>
+      <div class="step">
+        <div class="n">4</div>
+        <div class="body">
+          <h3>問「你希望我怎麼做」</h3>
+          <p>幫忙之前，先問對方的意願。你以為的幫忙，不一定是他要的；未經同意的「仗義執言」，有時會讓事情更糟。把選擇權交還給他，才是真正的尊重。</p>
+          <div class="ex"><b>尊重意願：</b>「你希望我怎麼幫你？我聽你的。」「你想要我聽就好，還是一起想辦法？」</div>
+          <details class="more"><summary>📖 理論與文獻</summary><div class="th">📖 <b>理論依據：</b>支持自主的互動方式與學習者的動機、投入有關<sup class="ref"><a href="#ref-11" title="Reeve & Cheon, 2021">11</a></sup>；先徵詢「可以分享我的想法嗎？」再給建議，是動機式晤談的核心做法<sup class="ref"><a href="#ref-12" title="Miller & Rollnick, 2023">12</a></sup>。</div></details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="howto">
+    <div class="eyebrow-row"><span class="no">伍</span><h2>對話要領：這樣說 vs. 別這樣說</h2><span class="en">Do &amp; Don't</span></div>
+    <p class="intro-p">同樣一件事，說法不同，關係走的方向就完全不同。以下依五大能力整理要領，每組都附上「研究依據」。</p>
+
+    <div class="pillar">
+      <h3><span class="dot" style="background:#6b7f8d"></span>穩住情緒（自我覺察 × 自我管理）</h3>
+      <p class="why">情緒上來時先照顧自己，才有餘裕照顧對話。</p>
+      <div class="dd">
+        <div class="col yes"><div class="lab">🌱 這樣說</div><ul>
+          <li>先深呼吸、暫停一下，再開口</li>
+          <li>說出自己的感受：「我有點緊張／難過」</li>
+          <li>說錯了願意承認：「對不起，我太衝動了」</li>
+          <li>需要時說明：「我需要十分鐘冷靜，等一下回來繼續談」</li>
+        </ul></div>
+        <div class="col no"><div class="lab">🍂 別這樣</div><ul>
+          <li>情緒一來就吼回去、指責對方</li>
+          <li>用辯解把焦點都放在自己身上</li>
+          <li>撂下「跟你講不通」就轉身離開</li>
+          <li>把情緒完全壓住、假裝沒事</li>
+        </ul></div>
+      </div>
+      <details class="more"><summary>📖 理論與文獻</summary><div class="theory"><b>📚 研究依據：</b>青少年期是情緒調節發展的關鍵階段，適合練習「先暫停再回應」<sup class="ref"><a href="#ref-6" title="Silvers, 2022">6</a></sup>。「情緒激動時約定暫停、之後回來繼續談」與避免冷戰，源自關係溝通研究<sup class="ref"><a href="#ref-19" title="Gottman & Silver, 1999">19</a></sup>；該研究原以伴侶為對象，用於親子與同儕屬合理類推，而非直接證據。</div></details>
+    </div>
+
+    <div class="pillar">
+      <h3><span class="dot" style="background:#6b8464"></span>讀懂對方（社會覺察 · 同理心）</h3>
+      <p class="why">在開口之前，先觀察、先傾聽、先站到對方的位置。</p>
+      <div class="dd">
+        <div class="col yes"><div class="lab">🌱 這樣說</div><ul>
+          <li>觀察對方的表情與狀態再回應</li>
+          <li>不預設立場：「我想聽你說」</li>
+          <li>試著設身處地：「這段日子你一定很孤單吧」</li>
+          <li>連看似兇的人，也想想他背後的處境</li>
+          <li>用自己的話複述：「你是說……對嗎？」</li>
+        </ul></div>
+        <div class="col no"><div class="lab">🍂 別這樣</div><ul>
+          <li>還沒聽完就替他下定論</li>
+          <li>隨口說「我懂你」，其實並不了解</li>
+          <li>只看見對方的行為，看不見行為背後的原因</li>
+          <li>邊聽邊想著怎麼反駁</li>
+        </ul></div>
+      </div>
+      <details class="more"><summary>📖 理論與文獻</summary><div class="theory"><b>📚 研究依據：</b>高品質傾聽包含專注、不評判、並以自己的話確認理解<sup class="ref"><a href="#ref-8" title="Kluger & Itzchakov, 2022">8</a></sup>；多問一個深入的問題，往往比預期更受歡迎<sup class="ref"><a href="#ref-15" title="Kardas et al., 2022">15</a></sup>。</div></details>
+    </div>
+
+    <div class="pillar">
+      <h3><span class="dot" style="background:#caa25a"></span>靠近與陪伴（人際技巧 · 溝通）</h3>
+      <p class="why">有時候不必說很多，願意在旁邊，就是最大的支持。</p>
+      <div class="dd">
+        <div class="col yes"><div class="lab">🌱 這樣說</div><ul>
+          <li>主動修復：「昨天是我不好，對不起」</li>
+          <li>安靜地陪著：「我在這裡，你慢慢說」</li>
+          <li>用一個小行動表達關心（遞一瓶水、陪他走一段）</li>
+          <li>肯定對方：「你為我們做的，我都看見了」</li>
+          <li>具體道歉：說出做了什麼、造成什麼影響</li>
+        </ul></div>
+        <div class="col no"><div class="lab">🍂 別這樣</div><ul>
+          <li>用公式化的建議敷衍：「你就找老師啊」</li>
+          <li>把關心說成命令或教訓</li>
+          <li>只想趕快把話題結束</li>
+          <li>「對不起啦，好了吧？」的草率道歉</li>
+        </ul></div>
+      </div>
+      <details class="more"><summary>📖 理論與文獻</summary><div class="theory"><b>📚 研究依據：</b>「主動修復」與「具體道歉」為關係研究的經典概念<sup class="ref"><a href="#ref-19" title="Gottman & Silver, 1999">19</a>,<a href="#ref-20" title="Lazare, 2004">20</a></sup>。被認真傾聽、被陪伴的經驗，能促進說話者的正向感受<sup class="ref"><a href="#ref-8" title="Kluger & Itzchakov, 2022">8</a></sup>。</div></details>
+    </div>
+
+    <div class="pillar">
+      <h3><span class="dot" style="background:#9c4a2a"></span>一起面對（負責任的決定）</h3>
+      <p class="why">尊重對方的意願，和他並肩，而不是替他扛、替他決定。</p>
+      <div class="dd">
+        <div class="col yes"><div class="lab">🌱 這樣說</div><ul>
+          <li>幫忙前先問：「你希望我怎麼做？」</li>
+          <li>把問題變成「我們一起想辦法」</li>
+          <li>願意共同承擔：「以後讓我也一起扛」</li>
+          <li>承諾要具體：「這週我先做＿＿」</li>
+        </ul></div>
+        <div class="col no"><div class="lab">🍂 別這樣</div><ul>
+          <li>沒問過就擅自替他「出頭」</li>
+          <li>搶著把事情全攬下，讓對方覺得自己沒用</li>
+          <li>衝動行事，結果越幫越忙</li>
+          <li>只說「我會努力」卻沒有下一步</li>
+        </ul></div>
+      </div>
+      <details class="more"><summary>📖 理論與文獻</summary><div class="theory"><b>📚 研究依據：</b>被過度接管會削弱自主感，支持自主的互動則有助動機與投入<sup class="ref"><a href="#ref-11" title="Reeve & Cheon, 2021">11</a></sup>。把承諾寫成具體的「如果……就……」計畫，結合對目標的思考，有助目標達成<sup class="ref"><a href="#ref-21" title="Wang et al., 2021">21</a></sup>。</div></details>
+    </div>
+  </section>
+
+  <section id="rewrite">
+    <div class="eyebrow-row"><span class="no">陸</span><h2>句型轉換工具箱</h2><span class="en">Rewrite Toolbox</span></div>
+    <div class="banner"><svg viewBox="0 0 800 110" role="img" aria-label="把容易踩雷的話換成更靠近的話"><use href="#scene"/><use href="#bubble" x="250" y="26" width="72" height="54" style="color:var(--warn)"/><text x="286" y="62" font-size="26" text-anchor="middle" fill="#fff">✕</text><path d="M345 54H440M425 41l16 13-16 13" stroke="var(--ink-soft)" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><use href="#bubble" x="478" y="26" width="72" height="54" style="color:var(--leaf)"/><text x="514" y="62" font-size="26" text-anchor="middle" fill="#fff">✓</text></svg></div>
+    <p class="intro-p">把「容易踩雷」的說法，換成「更靠近對方」的說法。這不是背誦台詞，而是理解每個轉換背後的原因，再用自己的話表達。</p>
+    <div class="rw">
+      <div class="rw-h"><span>容易踩雷</span><span>更靠近對方</span><span>為什麼</span></div>
+      <div class="rw-r"><span class="bad">「你怎麼又這樣！」</span><span class="good">「我看到作業還沒交，我有點擔心。」</span><span class="why2">描述觀察與感受，而非貼標籤</span></div>
+      <div class="rw-r"><span class="bad">「我懂你的感受。」</span><span class="good">「我不完全懂，但我想了解。」</span><span class="why2">不自以為懂、直接多問</span></div>
+      <div class="rw-r"><span class="bad">「你想太多了啦。」</span><span class="good">「聽起來這件事讓你很在意。」</span><span class="why2">先肯定感受，再談想法</span></div>
+      <div class="rw-r"><span class="bad">「你應該去找老師。」</span><span class="good">「你想先聊聊，還是想一起想辦法？」</span><span class="why2">先徵詢再給建議</span></div>
+      <div class="rw-r"><span class="bad">「我會努力的啦。」</span><span class="good">「這週我先做＿＿，做不到我會告訴你。」</span><span class="why2">具體計畫有助目標達成</span></div>
+      <div class="rw-r"><span class="bad">「對不起啦，好了吧？」</span><span class="good">「我昨天說了＿＿，讓你很難受，對不起。」</span><span class="why2">道歉要具體，避免草率帶過</span></div>
+      <div class="rw-r"><span class="bad">「交給我就好。」</span><span class="good">「我們一起來，你想先做哪一部分？」</span><span class="why2">支持自主、保護能力感</span></div>
+      <div class="rw-r"><span class="bad">「你為什麼不早說？」</span><span class="good">「發生什麼事了？我想知道。」</span><span class="why2">「為什麼」易被聽成責備，改問經歷</span></div>
+    </div>
+  </section>
+
+  <section id="traps">
+    <div class="eyebrow-row"><span class="no">柒</span><h2>小心這些「看起來很好」的陷阱</h2><span class="en">Hidden Traps</span></div>
+    <div class="banner"><svg viewBox="0 0 800 110" role="img" aria-label="提醒小心看起來很好的陷阱"><use href="#scene"/><use href="#person" x="280" y="40" width="30" height="52" style="color:var(--sky)"/><use href="#person" x="490" y="40" width="30" height="52" style="color:var(--dusk)"/><polygon points="400,14 442,88 358,88" fill="var(--warn)" stroke="var(--warn)" stroke-width="6" stroke-linejoin="round"/><text x="400" y="78" font-size="38" font-weight="700" text-anchor="middle" fill="#fff">!</text></svg></div>
+    <p class="intro-p">有些話乍聽之下很善良、很仗義，卻會在後面造成誤解或傷害。它們最難辨認，也最值得練習。</p>
+    <div class="traps">
+      <div class="trap">
+        <div class="t">① 空泛的承諾</div>
+        <p>「我會努力的啦」「我知道了」——聽起來很乖，但沒有具體內容，對方會覺得你只是想敷衍過去、結束這段對話。</p>
+        <div class="fix"><b>試試：</b>誠實一點，說出真實的狀態與感受，再補上一個小而具體的行動。</div>
+      </div>
+      <div class="trap">
+        <div class="t">② 空泛的「我懂你」</div>
+        <p>在還不了解對方處境時就說「我懂你的感受」，容易被識破成敷衍，反而把人推得更遠。真正的同理，是先承認「我其實不完全懂，但我想了解」。</p>
+        <div class="fix"><b>試試：</b>「我不太清楚你的狀況，你願意說說看嗎？」</div>
+      </div>
+      <div class="trap">
+        <div class="t">③ 沒問過就「替你出頭」</div>
+        <p>看到朋友被誤會，熱血地衝去替他講清楚——但沒問過他願不願意。好心的仗義，可能讓事情鬧更大，也讓當事人更有壓力。</p>
+        <div class="fix"><b>試試：</b>先問「你希望我怎麼幫你？」把主導權還給他。</div>
+      </div>
+      <div class="trap">
+        <div class="t">④ 好意卻傷了自尊</div>
+        <p>「你別擔心，交給我就好」——想分擔壓力，聽在對方耳裡卻可能變成「你不行、你沒用」。研究發現，當受助者明顯察覺到被支持時，有時反而更焦慮；低調、不張揚的「看不見的支持」通常更有效<sup class="ref"><a href="#ref-22" title="Bolger et al., 2000">22</a></sup>。</p>
+        <div class="fix"><b>試試：</b>用「我們一起」取代「交給我」；用不張揚的小行動陪伴。</div>
+      </div>
+      <div class="trap">
+        <div class="t">⑤ 太快給建議或打圓場</div>
+        <p>「你不要難過了」「想開一點就好」——這類話語看似安慰，卻是在要對方停止感受。經典的溝通理論把立刻給建議、說教、否定感受等稱為「溝通路障」<sup class="ref"><a href="#ref-9" title="Gordon, 1970">9</a></sup>，會讓對方覺得沒被聽見。</p>
+        <div class="fix"><b>試試：</b>先反映感受：「這真的很不容易。」等對方說完，再問要不要聽想法。</div>
+      </div>
+      <div class="trap">
+        <div class="t">⑥ 用批評與輕視來「激勵」</div>
+        <p>「你怎麼這麼不負責！」把一次行為變成人格評價。Gottman 與 Silver（1999）把「批評人格」與「防衛」視為會讓衝突惡化的溝通模式；批評針對「人」，抱怨針對「事」，後者較安全。</p>
+        <div class="fix"><b>試試：</b>把「你很自私」改成「那天你沒等我，我覺得被丟下。」（對事不對人）</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="check">
+    <div class="eyebrow-row"><span class="no">捌</span><h2>對話前，隨身自問清單</h2><span class="en">Quick Self-Check</span></div>
+    <div class="banner"><svg viewBox="0 0 800 110" role="img" aria-label="開口前的自問清單"><use href="#scene"/><rect x="300" y="12" width="22" height="22" rx="5" fill="none" stroke="var(--dusk)" stroke-width="3"/><path d="M305 23l5 5 9-11" stroke="var(--leaf)" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="340" y="19" width="170" height="8" rx="4" fill="var(--ink-soft)" opacity=".3"/><rect x="300" y="44" width="22" height="22" rx="5" fill="none" stroke="var(--dusk)" stroke-width="3"/><path d="M305 55l5 5 9-11" stroke="var(--leaf)" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="340" y="51" width="140" height="8" rx="4" fill="var(--ink-soft)" opacity=".3"/><rect x="300" y="76" width="22" height="22" rx="5" fill="none" stroke="var(--dusk)" stroke-width="3"/><rect x="340" y="83" width="190" height="8" rx="4" fill="var(--ink-soft)" opacity=".3"/></svg></div>
+    <p class="intro-p">玩到每一個選擇前，不妨在心裡快速過一遍這八個問題。它們不會給你答案，但會把你帶到更靠近對方的方向。括號是對應的 CASEL 能力。</p>
+    <div class="checklist">
+      <h3>開口之前，我是否……</h3>
+      <ul>
+        <li>先說得出自己現在的情緒是什麼？（自我覺察）</li>
+        <li>先穩住了自己，而不是被情緒推著說話？（自我管理）</li>
+        <li>有先觀察、傾聽對方，而不是急著給意見？（社會覺察）</li>
+        <li>避免替對方下定論，保留一點好奇？（社會覺察）</li>
+        <li>用「我」的感受表達，而不是用「你」去指責？（人際技巧）</li>
+        <li>看見了對方行為背後，那個說不出口的心情？（社會覺察）</li>
+        <li>在幫忙之前，問過對方的意願？（負責任的決定）</li>
+        <li>我的承諾，是具體、做得到的嗎？（負責任的決定）</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="reflect">
+    <div class="eyebrow-row"><span class="no">玖</span><h2>遊戲後的反思與討論</h2><span class="en">Reflection &amp; Discussion</span></div>
+    <div class="banner"><svg viewBox="0 0 800 110" role="img" aria-label="一起坐下來討論與反思"><use href="#scene"/><use href="#person" x="335" y="46" width="28" height="48" style="color:var(--sky)"/><use href="#person" x="386" y="40" width="28" height="54" style="color:var(--leaf)"/><use href="#person" x="437" y="46" width="28" height="48" style="color:var(--dusk)"/><use href="#bubble" x="300" y="4" width="46" height="35" style="color:var(--gold)"/><use href="#bubble" x="448" y="4" width="46" height="35" style="color:var(--sky)"/></svg></div>
+    <p class="intro-p">SEL 要能持續，關鍵之一是把練習連回日常生活與關係，因此需要「明確的反思」<sup class="ref"><a href="#ref-2" title="Mahoney et al., 2021">2</a>,<a href="#ref-4" title="Durlak et al., 2022">4</a></sup>。以下問題適合個人寫下，也適合課堂小組討論。</p>
+    <div class="disc">
+      <div><b>① 覺察</b>　剛才的選擇中，哪一句話讓你覺得「如果是我，我也會這樣說」？當時你猜自己的情緒是什麼？</div>
+      <div><b>② 換位</b>　選一個角色，說說他沒說出口的心情是什麼？你是從哪些線索看出來的？</div>
+      <div><b>③ 比較</b>　兩個看起來都很善意的選項，對角色的感受造成什麼不同影響？差別在哪個步驟？</div>
+      <div><b>④ 遷移</b>　生活中有沒有一段對話，你想重新說一次？你會換成哪個句型？</div>
+      <div><b>⑤ 行動</b>　這週你想嘗試哪一個「具體小行動」？（例：先暫停三秒、問一次「你希望我怎麼做」）</div>
+    </div>
+    <p style="margin-top:16px;font-size:15px;color:var(--ink-soft)"><b>給引導者：</b>請避免把討論變成「對／錯」評分；重點是讓學生說出理由。同一個情境可以有多種合理的回應，也請留意學生的文化與家庭背景差異，避免只有單一「標準說法」<sup class="ref"><a href="#ref-5" title="Jagers et al., 2021">5</a></sup>。</p>
+  </section>
+
+  <div class="closing">
+    <svg viewBox="0 0 800 110" role="img" aria-label="兩個人並肩坐在夕陽下"><use href="#scene"/><use href="#person" x="364" y="44" width="30" height="50" style="color:var(--sky)"/><use href="#person" x="410" y="44" width="30" height="50" style="color:var(--dusk)"/><use class="float" href="#heart" x="392" y="22" width="20" height="18" style="color:var(--dusk)"/></svg>
+    <p class="big">「原來每個人生氣或沉默的背後，<br>都藏著說不出口的情緒。」</p>
+    <p class="small">理解一個人，不是替他決定對錯，<br>而是願意蹲下來，聽他把話說完。</p>
+  </div>
+
+  <section id="refs" style="margin-top:50px">
+    <div class="eyebrow-row"><span class="no">拾</span><h2>參考文獻</h2><span class="en">References</span></div>
+    <ol class="refs">
+      <li id="ref-1">CASEL. (2024). <i>What is the CASEL framework?</i> Collaborative for Academic, Social, and Emotional Learning. https://casel.org/fundamentals-of-sel/what-is-the-casel-framework/</li>
+      <li id="ref-2">Mahoney, J. L., Weissberg, R. P., Greenberg, M. T., Dusenbury, L., Jagers, R. J., Niemi, K., Schlinger, M., Schlund, J., Shriver, T. P., VanAusdal, K., &amp; Yoder, N. (2021). Systemic social and emotional learning: Promoting educational success for all preschool to high school students. <i>American Psychologist, 76</i>(7), 1128–1142.</li>
+      <li id="ref-3">Cipriano, C., Strambler, M. J., Naples, L. H., Ha, C., Kirk, M., Wood, M., Sehgal, K., Zieher, A. K., Eveleigh, A., McCarthy, M., Funaro, M., Ponnock, A., Chow, J. C., &amp; Durlak, J. (2023). The state of evidence for social and emotional learning: A contemporary meta-analysis of universal school-based SEL interventions. <i>Child Development, 94</i>(5), 1181–1204.</li>
+      <li id="ref-4">Durlak, J. A., Mahoney, J. L., &amp; Boyle, A. E. (2022). What we know, and what we need to find out about universal, school-based social and emotional learning programs for children and adolescents: A review of meta-analyses and directions for future research. <i>Psychological Bulletin, 148</i>(11–12), 765–782.</li>
+      <li id="ref-5">Jagers, R. J., Skoog-Hoffman, A., Barthelus, B., &amp; Schlund, J. (2021). Transformative social and emotional learning: In pursuit of educational equity and excellence. <i>American Educator, 45</i>(2), 12–17.</li>
+      <li id="ref-6">Silvers, J. A. (2022). Adolescence as a pivotal period for emotion regulation development. <i>Current Opinion in Psychology, 44</i>, 258–263.</li>
+      <li id="ref-7">Weisz, E., Ong, D. C., Carlson, R. W., &amp; Zaki, J. (2021). Building empathy through motivation-based interventions. <i>Emotion, 21</i>(5), 990–999.</li>
+      <li id="ref-8">Kluger, A. N., &amp; Itzchakov, G. (2022). The power of listening at work. <i>Annual Review of Organizational Psychology and Organizational Behavior, 9</i>, 121–146.</li>
+      <li id="ref-9">Gordon, T. (1970). <i>Parent effectiveness training</i>. Peter H. Wyden.</li>
+      <li id="ref-10">Rosenberg, M. B. (2003). <i>Nonviolent communication: A language of life</i> (2nd ed.). PuddleDancer Press.</li>
+      <li id="ref-11">Reeve, J., &amp; Cheon, S. H. (2021). Autonomy-supportive teaching: Its malleability, benefits, and potential to improve educational practice. <i>Educational Psychologist, 56</i>(1), 54–77.</li>
+      <li id="ref-12">Miller, W. R., &amp; Rollnick, S. (2023). <i>Motivational interviewing: Helping people change and grow</i> (4th ed.). Guilford Press.</li>
+      <li id="ref-13">Cuff, B. M. P., Brown, S. J., Taylor, L., &amp; Howat, D. J. (2016). Empathy: A review of the concept. <i>Emotion Review, 8</i>(2), 144–153.</li>
+      <li id="ref-14">Davis, M. H. (1983). Measuring individual differences in empathy: Evidence for a multidimensional approach. <i>Journal of Personality and Social Psychology, 44</i>(1), 113–126.</li>
+      <li id="ref-15">Kardas, M., Kumar, A., &amp; Epley, N. (2022). Overly shallow?: Miscalibrated expectations create a barrier to deeper conversation. <i>Journal of Personality and Social Psychology, 122</i>(3), 367–398.</li>
+      <li id="ref-16">Gottman, J. M., Katz, L. F., &amp; Hooven, C. (1996). Parental meta-emotion philosophy and the emotional life of families: Theoretical models and preliminary data. <i>Journal of Family Psychology, 10</i>(3), 243–268.</li>
+      <li id="ref-17">Burleson, B. R. (2003). Emotional support skills. In J. O. Greene &amp; B. R. Burleson (Eds.), <i>Handbook of communication and social interaction skills</i> (pp. 551–594). Lawrence Erlbaum.</li>
+      <li id="ref-18">Rogers, C. R. (1957). The necessary and sufficient conditions of therapeutic personality change. <i>Journal of Consulting Psychology, 21</i>(2), 95–103.</li>
+      <li id="ref-19">Gottman, J. M., &amp; Silver, N. (1999). <i>The seven principles for making marriage work</i>. Crown.</li>
+      <li id="ref-20">Lazare, A. (2004). <i>On apology</i>. Oxford University Press.</li>
+      <li id="ref-21">Wang, G., Wang, Y., &amp; Gai, X. (2021). A meta-analysis of the effects of mental contrasting with implementation intentions on goal attainment. <i>Frontiers in Psychology, 12</i>, Article 565202.</li>
+      <li id="ref-22">Bolger, N., Zuckerman, A., &amp; Kessler, R. C. (2000). Invisible support and adjustment to stress. <i>Journal of Personality and Social Psychology, 79</i>(6), 953–961.</li>
+    </ol>
+  </section>
+
+  <footer>
+    看見彼此 · SEL 對話準則參考手冊　|　社會情緒學習鷹架教材<br>
+    本手冊為陪伴閱讀用的思考鷹架，不提供遊戲選項的標準答案。
+  </footer>
+
+</div>
+
+<script>window.addEventListener("beforeprint",function(){document.querySelectorAll("details.more").forEach(function(d){d.open=true;});});</script>
+</body>
+</html>
